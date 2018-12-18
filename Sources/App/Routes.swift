@@ -6,11 +6,20 @@ public func routes(_ router: Router) throws {
     router.get { req in
         return try req.view().render("welcome")
     }
-    
+
     // Says hello
     router.get("hello", String.parameter) { req -> Future<View> in
         return try req.view().render("hello", [
             "name": req.parameters.next(String.self)
         ])
     }
+
+    let userController = UserController()
+    router.post("register", use: userController.register)
+    router.post("login", use: userController.login)
+
+    let tokenAuthenticationMiddleware = User.tokenAuthMiddleware()
+    let authedRoutes = router.grouped(tokenAuthenticationMiddleware)
+    authedRoutes.get("profile", use: userController.profile)
+    authedRoutes.get("logout", use: userController.logout)
 }

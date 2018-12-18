@@ -22,6 +22,11 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     try databases.add(database: SQLiteDatabase(storage: .memory), as: .sqlite)
     services.register(databases)
 
+    var migrations = MigrationConfig()
+    migrations.add(model: User.self, database: .sqlite)
+    migrations.add(model: Token.self, database: .sqlite)
+    services.register(migrations)
+
     /// Register middleware
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
     middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
